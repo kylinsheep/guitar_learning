@@ -1,21 +1,59 @@
+import { useState } from 'react'
 import './App.css'
+import { Fretboard, ControlPanel, PromptPanel, StatsPanel, TrainerGrid } from './components'
+import { DEFAULT_FRETBOARD_MAP } from './music'
+import { TrainerConfig } from './types/ui'
 
 function App() {
+  const [config, setConfig] = useState<TrainerConfig>({
+    root: 'C',
+    scaleType: 'major',
+    mode: 'note',
+  })
+
+  const handleConfigChange = (newConfig: Partial<TrainerConfig>) => {
+    setConfig((prev) => ({ ...prev, ...newConfig }))
+  }
+
   return (
-    <main className="app-shell">
-      <h1>Guitar Trainer MVP</h1>
-      <p>Phase 0 scaffold is ready. Core modules will be added in Phase 1.</p>
-      <section className="phase0-status" aria-label="Phase 0 status">
-        <h2>Initialized Modules</h2>
-        <ul>
-          <li>music</li>
-          <li>quiz</li>
-          <li>state</li>
-          <li>storage</li>
-          <li>components</li>
-        </ul>
-      </section>
-    </main>
+    <div className="app">
+      <header className="app-header">
+        <h1>Guitar Trainer MVP</h1>
+        <p className="subtitle">Interactive Fretboard Training (Phase 2)</p>
+      </header>
+
+      <TrainerGrid
+        controlPanel={
+          <ControlPanel
+            config={config}
+            onConfigChange={handleConfigChange}
+            onStart={() => console.log('Training started:', config)}
+            onReset={() =>
+              setConfig({
+                root: 'C',
+                scaleType: 'major',
+                mode: 'note',
+              })
+            }
+          />
+        }
+        promptPanel={
+          <PromptPanel
+            question={undefined}
+            feedback={undefined}
+            onNext={undefined}
+          />
+        }
+        fretboard={
+          <Fretboard
+            board={DEFAULT_FRETBOARD_MAP}
+            activePositions={new Set()}
+            showLabels={true}
+          />
+        }
+        statsPanel={<StatsPanel stats={undefined} />}
+      />
+    </div>
   )
 }
 

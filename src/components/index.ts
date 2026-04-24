@@ -1,1 +1,5 @@
-export const componentsModuleReady = true
+export { Fretboard, StringRow, FretCell, type FretboardProps, type StringRowProps, type FretCellProps } from './Fretboard'
+export { ControlPanel, type ControlPanelProps } from './ControlPanel'
+export { PromptPanel, type PromptPanelProps } from './PromptPanel'
+export { StatsPanel, type StatsPanelProps } from './StatsPanel'
+export { TrainerLayout, TrainerGrid, type TrainerLayoutProps, type TrainerGridProps } from './TrainerLayout'

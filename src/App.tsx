@@ -21,20 +21,21 @@ function TrainerApp() {
   }
 
   const handleFretClick = (position: Position) => {
-    if (state.isTraining && !state.feedback) {
-      dispatch({ type: 'HANDLE_CLICK', payload: position })
+    if (state.isTraining && state.interactionState === 'answering') {
+      dispatch({ type: 'SELECT_POSITION', payload: position })
+    }
+  }
+
+  const handleSubmitAnswer = () => {
+    if (state.interactionState === 'answering') {
+      dispatch({ type: 'SUBMIT_ANSWER' })
     }
   }
 
   const handleNextQuestion = () => {
-    dispatch({ type: 'NEXT_QUESTION' })
-  }
-
-  const activePositions = new Set<string>()
-  if (state.question && state.isTraining) {
-    state.question.validPositions.forEach((pos) => {
-      activePositions.add(`${pos.string},${pos.fret}`)
-    })
+    if (state.interactionState === 'submitted') {
+      dispatch({ type: 'NEXT_QUESTION' })
+    }
   }
 
   return (
@@ -49,6 +50,7 @@ function TrainerApp() {
           <ControlPanel
             config={state.config}
             onConfigChange={handleConfigChange}
+            disableConfigChanges={state.interactionState === 'answering'}
             onStart={handleStartTraining}
             onReset={handleResetTraining}
           />
@@ -57,13 +59,18 @@ function TrainerApp() {
           <PromptPanel
             question={state.question}
             feedback={state.feedback}
-            onNext={state.feedback ? handleNextQuestion : undefined}
+            interactionState={state.interactionState}
+            selectedPositions={state.selectedPositions}
+            onSubmit={handleSubmitAnswer}
+            onNext={state.interactionState === 'submitted' ? handleNextQuestion : undefined}
           />
         }
         fretboard={
           <Fretboard
             board={DEFAULT_FRETBOARD_MAP}
-            activePositions={activePositions}
+            selectedPositions={state.selectedPositions}
+            feedback={state.feedback}
+            interactionState={state.interactionState}
             showLabels={true}
             onFretClick={handleFretClick}
           />

@@ -1,1 +1,1 @@
-export const storageModuleReady = true
+export * from './storage'

@@ -8,6 +8,7 @@ export interface TrainerState {
   stats: SessionStats
   isTraining: boolean
   clickedPositions: Set<string>
+  questionStartedAt: number
 }
 
 export type TrainerAction =
@@ -37,6 +38,7 @@ export const INITIAL_STATE: TrainerState = {
   },
   isTraining: false,
   clickedPositions: new Set(),
+  questionStartedAt: 0,
 }
 
 export function trainerReducer(state: TrainerState, action: TrainerAction): TrainerState {
@@ -70,6 +72,7 @@ export function trainerReducer(state: TrainerState, action: TrainerAction): Trai
         question: newQuestion,
         feedback: null,
         clickedPositions: new Set(),
+        questionStartedAt: Date.now(),
       }
     }
 
@@ -101,6 +104,13 @@ export function trainerReducer(state: TrainerState, action: TrainerAction): Trai
 
       newStats.accuracy = (newStats.correct / newStats.attempts) * 100
 
+      // Update average response time using incremental mean formula
+      const responseMs = state.questionStartedAt > 0 ? Date.now() - state.questionStartedAt : 0
+      if (responseMs > 0) {
+        newStats.avgResponseMs =
+          (newStats.avgResponseMs * (newStats.attempts - 1) + responseMs) / newStats.attempts
+      }
+
       return {
         ...state,
         feedback: isCorrect ? 'correct' : 'incorrect',
@@ -116,6 +126,7 @@ export function trainerReducer(state: TrainerState, action: TrainerAction): Trai
         question: newQuestion,
         feedback: null,
         clickedPositions: new Set(),
+        questionStartedAt: Date.now(),
       }
     }
 
